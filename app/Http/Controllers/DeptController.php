@@ -51,42 +51,99 @@ class DeptController extends Controller
         ]);
     }
 
-    public function dashboard()
+  public function dashboard(Request $request)
     {
-        $department = Auth::guard('depts')->user();
-        Log::info('Department dashboard accessed', ['dept_id' => $department->id]);
+        try {
+            $department = Auth::guard('depts')->user();
+            Log::info('Department dashboard accessed', ['dept_id' => $department->id]);
 
-        // --- START: MODIFIED SECTION ---
-        // Get the base query for the department's complaints
-        $complaintsQuery = Complaint::where('Dept_id', $department->id);
+            // --- CHANGE 1: Define a base query that is NEVER filtered by the request ---
+            $departmentBaseQuery = Complaint::where('Dept_id', $department->id);
 
-        // Calculate stats for the cards
-        $stats = [
-            'new' => (clone $complaintsQuery)->where('status', 'pending')->count(),
-            'in_progress' => (clone $complaintsQuery)->where('status', 'checking')->count(),
-            'recently_resolved' => (clone $complaintsQuery)->where('status', 'solved')
-                ->where('updated_at', '>=', now()->subDays(7))
-                ->count(),
-        ];
+            // Calculate stats from the UNFILTERED base query to always show totals
+            $statsResult = (clone $departmentBaseQuery)
+                ->selectRaw("
+                    COUNT(CASE WHEN status = 'pending' THEN 1 END) as new_count,
+                    COUNT(CASE WHEN status = 'checking' THEN 1 END) as in_progress_count,
+                    COUNT(CASE WHEN status = 'solved' AND updated_at >= ? THEN 1 END) as recently_resolved_count
+                ", [now()->subDays(7)])
+                ->first();
 
-        // Paginate the full list of complaints for the table
-        $complaints = $complaintsQuery->with(['student', 'responses'])
-            ->orderByRaw("
-            CASE 
-                WHEN status = 'pending' THEN 1
-                WHEN status = 'checking' THEN 2
-                ELSE 3
-            END
-        ")
-            ->latest()
-            ->paginate(10); // Changed to 10 for better view
+            $stats = [
+                'new' => $statsResult->new_count ?? 0,
+                'in_progress' => $statsResult->in_progress_count ?? 0,
+                'recently_resolved' => $statsResult->recently_resolved_count ?? 0,
+            ];
 
-        Log::info('Paginated complaints fetched for dashboard', ['count' => $complaints->count(), 'page' => $complaints->currentPage()]);
+            // --- CHANGE 2: Create a new query for the list and apply ALL filters to it ---
+            $listQuery = (clone $departmentBaseQuery)
+                ->when($request->filled('search'), function ($q) use ($request) {
+                    $search = $request->search;
+                    $q->where(function ($sub) use ($search) {
+                        $sub->where('title', 'like', "%{$search}%")
+                            ->orWhereHas('student', function ($studentQuery) use ($search) {
+                                $studentQuery->where('Stud_name', 'like', "%{$search}%");
+                            });
+                    });
+                })
+                // --- THIS IS THE NEW FILTER LOGIC ---
+                ->when($request->filled('status'), function ($q) use ($request) {
+                    $q->where('status', $request->status);
+                });
+                // --- END OF NEW FILTER LOGIC ---
 
-        // Pass both the paginated complaints and the stats to the view
-        return view('dept.dashboard', compact('complaints', 'stats'));
-        // --- END: MODIFIED SECTION ---
+
+            // The rest of your excellent logic now uses the filtered $listQuery
+            $sort = $request->get('sort', 'default');
+            $idQuery = (clone $listQuery)->select('complaints.id'); // Use the filtered query
+
+            if ($sort === 'default') {
+                $idQuery->orderByRaw("CASE WHEN status = 'pending' THEN 1 WHEN status = 'checking' THEN 2 WHEN status = 'solved' THEN 3 WHEN status = 'rejected' THEN 4 WHEN status = 'withdrawn' THEN 5 ELSE 6 END ASC");
+            } elseif ($sort === 'newest') {
+                $idQuery->orderByDesc('created_at');
+            } elseif ($sort === 'oldest') {
+                $idQuery->orderBy('created_at', 'asc');
+            } elseif ($sort === 'title_asc') {
+                $idQuery->orderBy('title', 'asc');
+            } elseif ($sort === 'title_desc') {
+                $idQuery->orderBy('title', 'desc');
+            }
+
+            $idQuery->orderByDesc('created_at');
+
+            // Paginate IDs
+            $complaintPage = $idQuery->paginate(10)->appends($request->all()); // appends() is crucial here
+            $complaintIds = $complaintPage->pluck('id')->all();
+
+            // Get full models
+            $complaintsCollection = collect();
+            if (!empty($complaintIds)) {
+                $complaintsCollection = Complaint::with(['student:id,Stud_name,Stud_email'])
+                    ->whereIn('id', $complaintIds)
+                    ->orderByRaw("FIELD(id, " . implode(',', $complaintIds) . ")")
+                    ->get();
+            }
+
+            $complaintPage->setCollection($complaintsCollection);
+
+            Log::info('Paginated complaints fetched with filters', [
+                'count' => $complaintPage->count(),
+                'search' => $request->search,
+                'status' => $request->status, 
+                'sort' => $sort,
+            ]);
+
+            return view('dept.dashboard', [
+                'complaints' => $complaintPage,
+                'stats' => $stats,
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error fetching department dashboard data: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return back()->with('error', 'Error loading dashboard data. Please try again later.');
+        }
     }
+
 
     public function show($id)
     {
@@ -129,10 +186,7 @@ class DeptController extends Controller
 
             Log::info('Complaint response saved', ['response_id' => $response->id]);
 
-            // --- THIS IS THE CHANGE ---
-            // Dispatch the job to send email in the background
             SendComplaintResponseNotification::dispatch($complaint, $response);
-            // --- END OF CHANGE ---
         }
 
         ActionLog::create([
@@ -151,15 +205,12 @@ class DeptController extends Controller
 
     public function showProfile()
     {
-        // Get the currently authenticated department user
         $department = Auth::guard('depts')->user();
 
         return view('dept.profile', compact('department'));
     }
 
-    /**
-     * NEW: Update the department's profile information.
-     */
+   
     public function updateProfile(Request $request)
     {
         $department = Auth::guard('depts')->user();
@@ -175,7 +226,6 @@ class DeptController extends Controller
             'password' => 'nullable|string|min:8|confirmed',
         ]);
 
-        // --- The rest of your code for logging and saving is perfect ---
         $originalDeptName = $department->Dept_name;
         $originalHodName = $department->Hod_name;
         $originalDeptEmail = $department->Dept_email;

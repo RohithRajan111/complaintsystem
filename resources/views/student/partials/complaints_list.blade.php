@@ -1,7 +1,7 @@
 @if($complaints->isEmpty())
     <div class="text-center text-subtle py-16 bg-surface rounded-lg shadow-sm border border-border-color">
-        <i class="fa-solid fa-check-circle fa-2x mb-4 text-primary"></i><br>
-        You're all clear! You haven't made any complaints yet.
+        <i class="fa-solid fa-magnifying-glass fa-2x mb-4 text-primary"></i><br>
+        No complaints found matching your criteria.
     </div>
 @else
     <div class="space-y-6">
@@ -12,10 +12,8 @@
                         <div class="flex items-center gap-3 mb-1">
                              @php
                                 $statusClasses = [
-                                    'pending'   => 'bg-warning/10 text-yellow-800 border-warning/20',
-                                    'checking'  => 'bg-info/10 text-blue-800 border-info/20',
-                                    'solved'    => 'bg-primary/10 text-green-800 border-primary/20',
-                                    'rejected'  => 'bg-danger/10 text-red-800 border-danger/20',
+                                    'pending'   => 'bg-warning/10 text-yellow-800 border-warning/20', 'checking'  => 'bg-info/10 text-blue-800 border-info/20',
+                                    'solved'    => 'bg-primary/10 text-green-800 border-primary/20',  'rejected'  => 'bg-danger/10 text-red-800 border-danger/20',
                                     'withdrawn' => 'bg-gray-100 text-gray-800 border-gray-200',
                                 ];
                             @endphp
@@ -25,7 +23,7 @@
                             <h3 class="text-lg font-bold text-strong">{{ $complaint->title }}</h3>
                         </div>
                         <p class="text-sm text-subtle">
-                            To: <span class="font-medium">{{ $complaint->department->name }}</span> | 
+                            To: <span class="font-medium">{{ $complaint->department->name }}</span> |
                             Submitted: <span class="font-medium">{{ $complaint->created_at->format('M d, Y') }}</span> ({{ $complaint->created_at->diffForHumans() }})
                         </p>
                     </div>
@@ -41,7 +39,7 @@
                         <p class="text-xs text-subtle uppercase font-semibold mb-1">Your Description</p>
                         <p class="text-strong text-sm whitespace-pre-wrap">{{ $complaint->description }}</p>
                     </div>
-                    
+
                     @if ($complaint->attachment_path)
                         <div>
                              <p class="text-xs text-subtle uppercase font-semibold mb-1">Your Attachment</p>
@@ -66,7 +64,7 @@
         @endforeach
     </div>
 
-    <!-- Pagination Links -->
+    <!-- Pagination links will automatically include the filter query strings -->
     <div class="mt-8">
         {{ $complaints->links() }}
     </div>

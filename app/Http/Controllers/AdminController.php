@@ -261,7 +261,7 @@ return $query->get();
         return redirect()->route('login');
     }
 
-   public function ajaxComplaints(Request $request)
+  public function ajaxComplaints(Request $request)
 {
     try {
         $filteredQuery = Complaint::query()
@@ -270,7 +270,7 @@ return $query->get();
             ->when($request->filled('search'), function ($q) use ($request) {
                 $q->where(function ($q2) use ($request) {
                     $q2->where('complaints.title', 'like', "%{$request->search}%")
-                       ->orWhere('students.Stud_name', 'like', "%{$request->search}%");
+                        ->orWhere('students.Stud_name', 'like', "%{$request->search}%"); 
                 });
             })
             ->when($request->filled('status') && $request->status !== 'all', function ($q) use ($request) {
@@ -278,27 +278,30 @@ return $query->get();
             })
             ->when($request->filled('dept'), function ($q) use ($request) {
                 $q->where('complaints.Dept_id', $request->dept);
-            });
-
-        $filteredQuery->orderByRaw("
-            CASE
-                WHEN complaints.status = 'pending' THEN 1
-                WHEN complaints.status = 'checking' THEN 2
-                WHEN complaints.status = 'solved' THEN 3
-                WHEN complaints.status = 'rejected' THEN 4
-                WHEN complaints.status = 'withdrawn' THEN 5
-                ELSE 6
-            END ASC
-        ")->orderByDesc('complaints.created_at');
+            })
+            ->orderByRaw("
+                CASE
+                    WHEN complaints.status = 'pending' THEN 1
+                    WHEN complaints.status = 'checking' THEN 2
+                    WHEN complaints.status = 'solved' THEN 3
+                    WHEN complaints.status = 'rejected' THEN 4
+                    WHEN complaints.status = 'withdrawn' THEN 5
+                    ELSE 6
+                END ASC
+            ")
+            ->orderByDesc('complaints.created_at');
 
         $complaintPage = $filteredQuery->paginate(10)->appends($request->all());
         $complaintIds = $complaintPage->pluck('id')->all();
 
-        $complaints = Complaint::with(['student:id,Stud_name', 'department:id,Dept_name'])
-            ->select('id', 'title', 'status', 'Dept_id', 'Student_id', 'created_at')
-            ->whereIn('id', $complaintIds)
-            ->orderByRaw("FIELD(id, " . implode(',', $complaintIds) . ")")
-            ->get();
+        $complaints = collect();
+        if (!empty($complaintIds)) {
+            $complaints = Complaint::with(['student:id,Stud_name', 'department:id,Dept_name'])
+                ->select('id', 'title', 'status', 'Dept_id', 'Student_id', 'created_at')
+                ->whereIn('id', $complaintIds)
+                ->orderByRaw("FIELD(id, " . implode(',', $complaintIds) . ")")
+                ->get();
+        }
 
         $complaintPage->setCollection($complaints);
 
@@ -308,6 +311,7 @@ return $query->get();
             'complaints' => $complaintPage,
             'departments' => $departments,
         ])->render();
+
     } catch (\Exception $e) {
         Log::error('Error fetching complaints: ' . $e->getMessage());
         return response('Error loading complaints', 500);
@@ -349,7 +353,6 @@ return $query->get();
                 $query->where('Dept_id', $request->dept);
             }
 
-            // Use ID-based pagination instead of OFFSET
             if ($page > 1) {
                 $previousMaxId = $maxId - (($page - 1) * $perPage);
                 $query->where('id', '<=', $previousMaxId);
@@ -358,13 +361,12 @@ return $query->get();
             $query->orderBy('id', 'desc');
             $complaints = $query->take($perPage)->get();
 
-            // Create manual pagination
             $hasMorePages = $complaints->count() == $perPage;
             $pagination = [
                 'current_page' => $page,
                 'has_more_pages' => $hasMorePages,
                 'per_page' => $perPage,
-                'total' => null // We don't calculate total for performance
+                'total' => null 
             ];
 
             $departments = Dept::all();

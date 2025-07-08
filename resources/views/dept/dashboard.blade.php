@@ -5,149 +5,143 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Department Dashboard</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
-
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-
-    <script>
-    tailwind.config = {
-        theme: {
-            extend: {
-                colors: {
-                    // ---------------------------------
-                    // PRIMARY THEME (Indigo)
-                    // ---------------------------------
-                    'primary': '#4f46e5',      // Indigo-600: For main buttons, active links, icons
-                    'primary-hover': '#4338ca', // Indigo-700: For hover states on primary elements
-                    'primary-light': '#e0e7ff', // Indigo-100: For light backgrounds, like active sidebar links or badges
-
-                    // ---------------------------------
-                    // NEUTRAL / BASE THEME (Gray)
-                    // ---------------------------------
-                    'surface': '#ffffff',      // White: For card backgrounds, tables, modals
-                    'base': '#f3f4f6',         // Gray-100: For the main page background
-                    'subtle': '#6b7280',       // Gray-500: For labels, placeholders, timestamps, helper text
-                    'strong': '#1f2937',       // Gray-800: For main text, titles, body content
-                    'border-color': '#e5e7eb', // Gray-200: For borders, dividers, form inputs
-
-                    // ----------------------------------------------------
-                    // SEMANTIC STATUS COLORS (For alerts, badges, etc.)
-                    // ----------------------------------------------------
-
-                    // --- Success (Green) ---
-                    'success': '#16a34a',      // Green-600: Main success color for icons, borders
-                    'success-bg': '#dcfce7',   // Green-100: Background for success alerts and badges
-                    'success-text': '#15803d', // Green-800: Text color for use on success-bg
-
-                    // --- Danger (Red) ---
-                    'danger': '#dc2626',       // Red-600: Main danger color for delete icons, error borders
-                    'danger-bg': '#fee2e2',    // Red-100: Background for error alerts and badges
-                    'danger-text': '#b91c1c',  // Red-700: Text color for use on danger-bg
-
-                    // --- Warning (Amber/Yellow) ---
-                    'warning': '#f59e0b',      // Amber-500: Main warning color
-                    'warning-bg': '#fef3c7',   // Amber-100: Background for warning alerts and badges
-                    'warning-text': '#b45309', // Amber-700: Text color for use on warning-bg
-                    
-                    // --- Info (Blue) ---
-                    'info': '#2563eb',         // Blue-600: Main info color for "In Progress" statuses
-                    'info-bg': '#dbeafe',      // Blue-100: Background for info alerts and badges
-                    'info-text': '#1d4ed8',    // Blue-700: Text color for use on info-bg
-                }
-            }
-        }
-    }
-</script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .form-input { @apply w-full border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500; }
+    </style>
 </head>
-<body class="bg-base font-sans text-subtle min-h-screen">
+<body class="bg-gray-50 font-sans text-gray-800 min-h-screen">
 
-
-    <nav class="bg-strong text-white px-6 py-4 flex justify-between items-center shadow-md">
-        <span class="text-xl font-bold">Department Dashboard</span>
-        <div class="flex items-center gap-6">
-            <a href="{{ route('showdept.dashboard') }}" class="text-white font-semibold">Dashboard</a>
-            <a href="{{ route('dept.profile.show') }}" class="text-gray-300 hover:text-white transition">Profile</a>
-            <form action="{{ route('logout') }}" method="POST">
-                @csrf
-                <button class="bg-danger hover:bg-red-600 text-white px-4 py-2 rounded-md transition-colors flex items-center gap-2">
-                    <i class="fa-solid fa-right-from-bracket"></i> Logout
-                </button>
-            </form>
-        </div>
-    </nav>
+    <header class="bg-white shadow-sm">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <span class="text-2xl font-bold text-indigo-600">Department Dashboard</span>
+            <div class="flex items-center gap-6">
+                <a href="{{ route('showdept.dashboard') }}" class="font-semibold text-indigo-600">Dashboard</a>
+                <a href="{{ route('dept.profile.show') }}" class="text-gray-600 hover:text-indigo-600 transition">Profile</a>
+                <form action="{{ route('logout') }}" method="POST">
+                    @csrf
+                    <button class="bg-red-500 hover:bg-red-600 text-white font-semibold px-4 py-2 rounded-lg transition-colors flex items-center gap-2">
+                        <i class="fa-solid fa-right-from-bracket"></i> Logout
+                    </button>
+                </form>
+            </div>
+        </nav>
+    </header>
 
     <!-- Main Content -->
     <main class="container mx-auto px-6 py-8">
         
         <!-- Stat Cards Section -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div class="bg-surface p-6 rounded-lg shadow-sm border border-border-color flex items-center gap-4">
-                <div class="bg-warning/10 text-warning p-3 rounded-full"><i class="fa-solid fa-inbox fa-xl"></i></div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex items-center gap-5">
+                <div class="bg-yellow-100 text-yellow-600 rounded-full h-12 w-12 flex items-center justify-center"><i class="fa-solid fa-inbox fa-lg"></i></div>
                 <div>
-                    <p class="text-3xl font-bold text-strong">{{ $stats['new'] }}</p>
-                    <p class="text-sm text-subtle font-medium">New Complaints</p>
+                    <p class="text-3xl font-bold text-gray-900">{{ $stats['new'] }}</p>
+                    <p class="text-sm text-gray-500 font-medium">New Complaints</p>
                 </div>
             </div>
-            <div class="bg-surface p-6 rounded-lg shadow-sm border border-border-color flex items-center gap-4">
-                <div class="bg-info/10 text-info p-3 rounded-full"><i class="fa-solid fa-spinner fa-xl fa-spin"></i></div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex items-center gap-5">
+                <div class="bg-blue-100 text-blue-600 rounded-full h-12 w-12 flex items-center justify-center"><i class="fa-solid fa-spinner fa-lg"></i></div>
                 <div>
-                    <p class="text-3xl font-bold text-strong">{{ $stats['in_progress'] }}</p>
-                    <p class="text-sm text-subtle font-medium">In Progress</p>
+                    <p class="text-3xl font-bold text-gray-900">{{ $stats['in_progress'] }}</p>
+                    <p class="text-sm text-gray-500 font-medium">In Progress</p>
                 </div>
             </div>
-            <div class="bg-surface p-6 rounded-lg shadow-sm border border-border-color flex items-center gap-4">
-                <div class="bg-primary/10 text-primary p-3 rounded-full"><i class="fa-solid fa-check-double fa-xl"></i></div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex items-center gap-5">
+                <div class="bg-green-100 text-green-600 rounded-full h-12 w-12 flex items-center justify-center"><i class="fa-solid fa-check-double fa-lg"></i></div>
                 <div>
-                    <p class="text-3xl font-bold text-strong">{{ $stats['recently_resolved'] }}</p>
-                    <p class="text-sm text-subtle font-medium">Resolved (Last 7 Days)</p>
+                    <p class="text-3xl font-bold text-gray-900">{{ $stats['recently_resolved'] }}</p>
+                    <p class="text-sm text-gray-500 font-medium">Resolved (Last 7 Days)</p>
                 </div>
             </div>
         </div>
 
         <!-- Complaints Table Card -->
-        <div class="bg-surface shadow-md rounded-lg border border-border-color overflow-hidden"> 
-            <div class="p-6 border-b border-border-color"><h2 class="text-xl font-bold text-strong">Incoming Complaints</h2></div>
+        <div class="bg-white shadow-lg rounded-xl border border-gray-200 overflow-hidden"> 
+            <div class="p-6 border-b border-gray-200"><h2 class="text-xl font-bold text-gray-900">Incoming Complaints</h2></div>
+            
+            <!-- START: UPDATED FILTER FORM -->
+            <form method="GET" action="{{ route('showdept.dashboard') }}" class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-6 bg-gray-50/50 border-b border-gray-200">
+                <!-- Search Input -->
+                <div class="flex items-center gap-2 w-full md:w-1/2 relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 text-gray-400"></i>
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by title or student name" class="form-input pl-10 py-2 w-full"/>
+                </div>
+
+                <!-- Filter and Sort Inputs -->
+                <div class="flex items-center gap-2">
+                    <!-- Status Filter Dropdown -->
+                    <select name="status" class="form-input py-2">
+                        <option value="">All Status</option>
+                        <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
+                        <option value="checking" {{ request('status') == 'checking' ? 'selected' : '' }}>Checking</option>
+                        <option value="solved" {{ request('status') == 'solved' ? 'selected' : '' }}>Solved</option>
+                        <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>Rejected</option>
+                        <option value="withdrawn" {{ request('status') == 'withdrawn' ? 'selected' : '' }}>Withdrawn</option>
+                    </select>
+
+                    <!-- Sort Dropdown -->
+                    <select name="sort" class="form-input py-2">
+                        <option value="default" {{ request('sort') === 'default' ? 'selected' : '' }}>Sort by Status</option>
+                        <option value="newest" {{ request('sort') === 'newest' ? 'selected' : '' }}>Newest First</option>
+                        <option value="oldest" {{ request('sort') === 'oldest' ? 'selected' : '' }}>Oldest First</option>
+                        <option value="title_asc" {{ request('sort') === 'title_asc' ? 'selected' : '' }}>Title A–Z</option>
+                        <option value="title_desc" {{ request('sort') === 'title_desc' ? 'selected' : '' }}>Title Z–A</option>
+                    </select>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors shadow-sm">
+                        Filter
+                    </button>
+                </div>
+            </form>
+            <!-- END: UPDATED FILTER FORM -->
+
+
             @if($complaints->isEmpty())
-                <div class="text-center text-subtle py-16"><i class="fa-solid fa-shield-check fa-2x mb-4 text-primary"></i><br>Excellent! There are no pending complaints.</div>
+                <div class="text-center text-gray-500 py-20">
+                    <i class="fa-solid fa-magnifying-glass fa-3x mb-4 text-indigo-500"></i><br>
+                    <span class="font-medium">No complaints found.</span><br> 
+                    Try adjusting your search or filter criteria.
+                </div>
             @else
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm">
-                        <thead class="bg-base text-strong font-semibold">
+                        <thead class="bg-gray-50 text-gray-600">
                             <tr>
-                                <th class="px-6 py-3 text-left">Student</th>
-                                <th class="px-6 py-3 text-left">Complaint</th>
-                                <th class="px-6 py-3 text-center">Status</th>
-                                <th class="px-6 py-3 text-left">Submitted</th>
-                                <th class="px-6 py-3 text-center">Action</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Student</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Complaint</th>
+                                <th class="px-6 py-3 text-center text-xs font-semibold uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Submitted</th>
+                                <th class="px-6 py-3 text-center text-xs font-semibold uppercase tracking-wider">Action</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-border-color">
+                        <tbody class="divide-y divide-gray-200">
                             @foreach($complaints as $complaint)
-                                <tr class="hover:bg-base transition-colors">
-                                    <td class="px-6 py-4">
-                                        <div class="font-medium text-strong">{{ $complaint->student->Stud_name }}</div>
-                                        <div class="text-xs text-subtle">{{ $complaint->student->Stud_email }}</div>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <div class="font-semibold text-strong truncate" title="{{ $complaint->title }}">#{{ $complaint->id }} - {{ $complaint->title }}</div>
-                                        <div class="text-xs text-subtle truncate">{{ Str::limit($complaint->description, 60) }}</div>
-                                    </td>
+                                <tr class="hover:bg-gray-50/50 transition-colors">
+                                    <td class="px-6 py-4 whitespace-nowrap"><div class="font-medium text-gray-900">{{ $complaint->student->Stud_name }}</div><div class="text-xs text-gray-500">{{ $complaint->student->Stud_email }}</div></td>
+                                    <td class="px-6 py-4 max-w-sm"><div class="font-semibold text-gray-900 truncate" title="{{ $complaint->title }}">#{{ $complaint->id }} - {{ $complaint->title }}</div><div class="text-xs text-gray-500 truncate">{{ Str::limit($complaint->description, 60) }}</div></td>
                                     <td class="px-6 py-4 text-center">
                                         @php
                                             $statusClasses = [
-                                                'pending'   => 'bg-warning/10 text-yellow-800', 'checking'  => 'bg-info/10 text-blue-800',
-                                                'solved'    => 'bg-primary/10 text-green-800',  'rejected'  => 'bg-danger/10 text-red-800',
-                                                'withdrawn' => 'bg-gray-100 text-gray-800',
+                                                'pending'   => 'bg-yellow-100 text-yellow-800', 'checking'  => 'bg-blue-100 text-blue-800',
+                                                'solved'    => 'bg-green-100 text-green-800',  'rejected'  => 'bg-red-100 text-red-800',
+                                                'withdrawn' => 'bg-gray-100 text-gray-700',
                                             ];
                                         @endphp
-                                        <span class="px-3 py-1 text-xs font-semibold rounded-full {{ $statusClasses[$complaint->status] ?? 'bg-gray-200' }}">{{ str_replace('_', ' ', $complaint->status) }}</span>
+                                        <span class="px-3 py-1 text-xs font-semibold rounded-full {{ $statusClasses[$complaint->status] ?? 'bg-gray-200' }}">{{ ucfirst(str_replace('_', ' ', $complaint->status)) }}</span>
                                     </td>
-                                    <td class="px-6 py-4 text-subtle">{{ $complaint->created_at->diffForHumans() }}</td>
+                                    <td class="px-6 py-4 text-gray-500 whitespace-nowrap">{{ $complaint->created_at->diffForHumans() }}</td>
                                     <td class="px-6 py-4 text-center">
                                         @php $isClosed = in_array($complaint->status, ['solved', 'rejected', 'withdrawn']); @endphp
-                                        <button class="view-details-btn text-white px-4 py-2 rounded-md text-xs font-medium transition-colors flex items-center gap-2 mx-auto {{ $isClosed ? 'bg-subtle cursor-not-allowed' : 'bg-primary hover:bg-primary-hover' }}" data-id="{{ $complaint->id }}">
+                                        <button class="view-details-btn text-white px-4 py-2 rounded-lg text-xs font-medium transition-colors flex items-center gap-2 mx-auto shadow-sm {{ $isClosed ? 'bg-gray-400' : 'bg-indigo-600 hover:bg-indigo-700' }}" data-id="{{ $complaint->id }}">
                                             <i class="fa-solid fa-eye"></i> {{ $isClosed ? 'View' : 'Respond' }}
                                         </button>
                                     </td>
@@ -156,123 +150,106 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="p-6 bg-base border-t border-border-color">{{ $complaints->links() }}</div>
+                <!-- Pagination links will now include all filters automatically -->
+                <div class="p-4 bg-gray-50 border-t border-gray-200">{{ $complaints->links() }}</div>
             @endif
         </div> 
     </main>
 
     <!-- Complaint Details Modal -->
     <div id="complaintModal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center hidden z-50">
-        <div class="bg-surface rounded-lg shadow-2xl w-full max-w-2xl border border-border-color transform transition-all scale-95 opacity-0" id="modal-content">
-            <div class="flex justify-between items-center p-4 border-b border-border-color">
-                <h3 class="text-xl font-semibold text-strong flex items-center gap-3"><i class="fa-solid fa-comment-dots text-primary"></i>Complaint Details</h3>
-                <button class="close-modal-btn text-subtle hover:text-strong text-2xl">×</button>
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl border border-gray-200 transform transition-all scale-95 opacity-0" id="modal-content">
+            <div class="flex justify-between items-center p-4 border-b border-gray-200">
+                <h3 class="text-xl font-semibold text-gray-900 flex items-center gap-3"><i class="fa-solid fa-comment-dots text-indigo-600"></i>Complaint Details</h3>
+                <button class="close-modal-btn text-gray-400 hover:text-gray-800 text-2xl">×</button>
             </div>
             
             <div class="p-6 space-y-5 max-h-[80vh] overflow-y-auto">
-                <div>
-                    <p class="text-xs font-semibold text-subtle uppercase">Title</p><h4 id="modal-title" class="font-bold text-strong text-lg"></h4>
-                    <p class="text-xs font-semibold text-subtle uppercase mt-3">Student</p><p id="modal-student" class="text-strong"></p>
-                </div>
-                <div class="space-y-2"><p class="text-xs font-semibold text-subtle uppercase">Description</p><p id="modal-description" class="p-3 bg-base border border-border-color rounded-md whitespace-pre-wrap text-sm"></p></div>
-                <div id="modal-attachment-container" class="hidden space-y-2"><p class="text-xs font-semibold text-subtle uppercase">Attachment</p><a id="modal-attachment-link" href="#" target="_blank" class="inline-flex items-center gap-2 text-info hover:underline text-sm font-medium p-2 bg-info/10 border border-info/20 rounded-md"><i class="fa-solid fa-paperclip"></i> View / Download Attachment</a></div>
-                <div id="modal-responses-container" class="hidden space-y-2"><p class="text-xs font-semibold text-subtle uppercase">Response History</p><div id="modal-responses" class="text-sm space-y-2 max-h-40 overflow-y-auto p-3 border rounded-md bg-base"></div></div>
-                <div id="closed-complaint-message" class="hidden p-3 bg-warning/10 border border-warning/20 text-yellow-800 rounded-md text-center font-medium">This complaint is closed and cannot be modified.</div>
+                <div><p class="text-xs font-semibold text-gray-500 uppercase">Title</p><h4 id="modal-title" class="font-bold text-gray-900 text-lg"></h4></div>
+                <div><p class="text-xs font-semibold text-gray-500 uppercase">Student</p><p id="modal-student" class="text-gray-800"></p></div>
+                <div class="space-y-2"><p class="text-xs font-semibold text-gray-500 uppercase">Description</p><p id="modal-description" class="p-3 bg-gray-50 border border-gray-200 rounded-md whitespace-pre-wrap text-sm"></p></div>
+                <div id="modal-attachment-container" class="hidden space-y-2"><p class="text-xs font-semibold text-gray-500 uppercase">Attachment</p><a id="modal-attachment-link" href="#" target="_blank" class="inline-flex items-center gap-2 text-indigo-600 hover:underline text-sm font-medium p-2 bg-indigo-50 border border-indigo-200 rounded-md"><i class="fa-solid fa-paperclip"></i> View Attachment</a></div>
+                <div id="modal-responses-container" class="hidden space-y-2"><p class="text-xs font-semibold text-gray-500 uppercase">Response History</p><div id="modal-responses" class="text-sm space-y-2 max-h-40 overflow-y-auto p-3 border rounded-md bg-gray-50"></div></div>
+                <div id="closed-complaint-message" class="hidden p-3 bg-yellow-100 border border-yellow-200 text-yellow-800 rounded-md text-center font-medium">This complaint is closed and cannot be modified.</div>
                 
-                <form id="responseForm" class="space-y-4 pt-5 border-t border-border-color">
-                    @csrf
+                <form id="responseForm" class="space-y-4 pt-5 border-t border-gray-200">
                     <input type="hidden" id="complaint_id" name="complaint_id">
-                    <h4 class="text-lg font-semibold text-strong">Update Response</h4>
-                    <div id="form-error" class="hidden p-3 bg-danger/10 text-danger rounded-md text-sm border border-danger/20"></div>
+                    <h4 class="text-lg font-semibold text-gray-900">Update Response</h4>
+                    <div id="form-error" class="hidden p-3 bg-red-100 text-red-700 rounded-md text-sm border border-red-200"></div>
                     <div>
-                        <label for="status" class="block text-sm font-medium text-strong mb-1">Update Status</label>
-                        <select name="status" id="status" class="mt-1 w-full border-border-color rounded-md shadow-sm focus:border-primary focus:ring-primary" required><option value="">-- Select Status --</option><option value="checking">Checking</option><option value="solved">Solved</option><option value="rejected">Rejected</option></select>
+                        <label for="status" class="block text-sm font-medium text-gray-700 mb-1">Update Status</label>
+                        <select name="status" id="status" class="form-input" required><option value="">-- Select Status --</option><option value="checking">Checking</option><option value="solved">Solved</option><option value="rejected">Rejected</option></select>
                     </div>
-                    <div id="responseBox" class="hidden"><label for="response" class="block text-sm font-medium text-strong mb-1">Response Message (optional)</label><textarea name="response" id="response" class="mt-1 w-full border-border-color rounded-md shadow-sm focus:border-primary focus:ring-primary" rows="3"></textarea></div>
+                    <div id="responseBox" class="hidden"><label for="response" class="block text-sm font-medium text-gray-700 mb-1">Response Message (required for solved/rejected)</label><textarea name="response" id="response" class="form-input" rows="3"></textarea></div>
                     <div class="flex justify-end gap-3 pt-2">
-                        <button type="button" class="close-modal-btn px-4 py-2 bg-gray-200 text-strong rounded-md hover:bg-gray-300">Cancel</button>
-                        <button type="submit" id="submit-response-btn" class="px-5 py-2 bg-primary text-white rounded-md font-medium hover:bg-primary-hover flex items-center gap-2"><i class="fa-solid fa-paper-plane"></i> Submit Response</button>
+                        <button type="button" class="close-modal-btn px-4 py-2 bg-gray-200 text-gray-800 rounded-lg font-semibold hover:bg-gray-300">Cancel</button>
+                        <button type="submit" id="submit-response-btn" class="px-5 py-2 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 flex items-center gap-2"><i class="fa-solid fa-paper-plane"></i> Submit Response</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- JAVASCRIPT: Logic is preserved, animations are added -->
+    <!-- JAVASCRIPT (No changes needed) -->
     <script>
         $(document).ready(function() {
             $.ajaxSetup({ headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') } });
 
-            const modal = $('#complaintModal');
-            const modalContent = $('#modal-content');
+            const modal = $('#complaintModal'), modalContent = $('#modal-content');
+            const showModal = () => { modal.removeClass('hidden'); setTimeout(() => modalContent.removeClass('scale-95 opacity-0'), 10); };
+            const hideModal = () => { modalContent.addClass('scale-95 opacity-0'); setTimeout(() => modal.addClass('hidden'), 200); };
 
-            function showModal() {
-                modal.removeClass('hidden');
-                setTimeout(() => modalContent.removeClass('scale-95 opacity-0'), 50);
-            }
-
-            function hideModal() {
-                modalContent.addClass('scale-95 opacity-0');
-                setTimeout(() => modal.addClass('hidden'), 200);
-            }
-
-            $('#status').on('change', function() {
-                $('#responseBox').toggleClass('hidden', !['solved', 'rejected'].includes($(this).val()));
-            });
+            $('#status').on('change', function() { $('#responseBox').css('display', ['solved', 'rejected'].includes($(this).val()) ? 'block' : 'none'); });
 
             $('.view-details-btn').on('click', function() {
                 const complaintId = $(this).data('id');
                 $('#responseForm, #closed-complaint-message, #form-error, #responseBox, #modal-responses-container, #modal-attachment-container').addClass('hidden');
                 $('#responseForm')[0].reset();
 
-                $.ajax({
-                    url: `/dept/complaint/${complaintId}`,
-                    method: 'GET',
-                    success: function(data) {
-                        $('#modal-title').text(data.title);
-                        $('#modal-student').text(`${data.student.Stud_name} (${data.student.Stud_email})`);
-                        $('#modal-description').text(data.description);
-                        $('#complaint_id').val(data.id);
-                        if (data.attachment_path) {
-                            $('#modal-attachment-link').attr('href', `/storage/${data.attachment_path}`);
-                            $('#modal-attachment-container').removeClass('hidden');
-                        }
-                        if(data.responses && data.responses.length > 0) {
-                            $('#modal-responses').html(data.responses.map(res => `<div class="p-2 bg-white rounded border border-border-color"><strong>Dept:</strong> ${res.response} <span class="text-xs text-subtle float-right">${new Date(res.created_at).toLocaleString()}</span></div>`).join(''));
-                            $('#modal-responses-container').removeClass('hidden');
-                        }
-                        if (['solved', 'rejected', 'withdrawn'].includes(data.status)) {
-                            $('#closed-complaint-message').removeClass('hidden');
-                        } else {
-                            $('#responseForm').removeClass('hidden');
-                            $('#status').val(data.status === 'pending' ? '' : data.status).trigger('change');
-                        }
-                        $('#responseForm').attr('action', `/dept/respond/${complaintId}`);
-                        showModal();
-                    },
-                    error: (xhr) => alert('Error: ' + (xhr.responseJSON?.message || 'Could not fetch details.'))
-                });
+                $.get(`/dept/complaint/${complaintId}`).done(data => {
+                    $('#modal-title').text(`#${data.id} - ${data.title}`);
+                    $('#modal-student').text(`${data.student.Stud_name} (${data.student.Stud_email})`);
+                    $('#modal-description').text(data.description);
+                    $('#complaint_id').val(data.id);
+
+                    if (data.attachment_path) {
+                        $('#modal-attachment-link').attr('href', `/storage/${data.attachment_path}`);
+                        $('#modal-attachment-container').removeClass('hidden');
+                    }
+                    if (data.responses && data.responses.length > 0) {
+                        $('#modal-responses').html(data.responses.map(res => `<div class="p-2 bg-white rounded border border-gray-200"><strong>Dept:</strong> ${res.response} <span class="text-xs text-gray-500 float-right">${new Date(res.created_at).toLocaleString()}</span></div>`).join(''));
+                        $('#modal-responses-container').removeClass('hidden');
+                    }
+                    if (['solved', 'rejected', 'withdrawn'].includes(data.status)) {
+                        $('#closed-complaint-message').removeClass('hidden');
+                    } else {
+                        $('#responseForm').removeClass('hidden');
+                        $('#status').val(data.status === 'pending' ? '' : data.status).trigger('change');
+                    }
+                    $('#responseForm').attr('action', `/dept/respond/${complaintId}`);
+                    showModal();
+                }).fail(xhr => alert('Error: ' + (xhr.responseJSON?.message || 'Could not fetch details.')));
             });
 
             $('.close-modal-btn').on('click', hideModal);
 
             $('#responseForm').on('submit', function(e) {
                 e.preventDefault();
-                const submitButton = $('#submit-response-btn');
-                const originalHtml = submitButton.html();
-                submitButton.prop('disabled', true).html('<i class="fa-solid fa-spinner fa-spin"></i> Submitting...');
+                const btn = $('#submit-response-btn');
+                btn.prop('disabled', true).html('<i class="fa-solid fa-spinner fa-spin"></i> Submitting...');
                 $('#form-error').addClass('hidden').text('');
+
                 $.ajax({
                     url: $(this).attr('action'), method: 'POST', data: $(this).serialize(),
-                    success: (res) => { if (res.success) { hideModal(); alert(res.message); window.location.reload(); } },
-                    error: (xhr) => {
-                        let errorMsg = 'An unexpected error occurred.';
-                        if (xhr.responseJSON) { errorMsg = xhr.responseJSON.errors ? Object.values(xhr.responseJSON.errors).join('\n') : xhr.responseJSON.message; }
-                        $('#form-error').html(errorMsg.replace(/\n/g, '<br>')).removeClass('hidden');
+                    success: res => { if (res.success) { hideModal(); alert(res.message); window.location.reload(); } },
+                    error: xhr => {
+                        let msg = xhr.responseJSON?.message || 'An unexpected error occurred.';
+                        if (xhr.responseJSON?.errors) msg = Object.values(xhr.responseJSON.errors).join('\n');
+                        $('#form-error').html(msg.replace(/\n/g, '<br>')).removeClass('hidden');
                     },
-                    complete: () => submitButton.prop('disabled', false).html(originalHtml)
+                    complete: () => btn.prop('disabled', false).html('<i class="fa-solid fa-paper-plane"></i> Submit Response')
                 });
-});
+            });
         });
     </script>
 </body>
